@@ -4,7 +4,6 @@ import {useContext} from 'react';
 const Popup = ({sectionCount}) => {
     const SECTIONS_COUNT = sectionCount || 5;
     const sections = Array.from({length:SECTIONS_COUNT}, (_,i)=>i+1);
-    console.log(sections);
     const {setPopUpVisibility, setFromDate, setToDate, setOperator} = useContext(ShipmentContext);
     const handleOk = (e) => {
         e.preventDefault();
@@ -21,13 +20,14 @@ const Popup = ({sectionCount}) => {
             smallestIndex = smallestIndex > keys[1] ? keys[1] : smallestIndex;
             data[keys[1]] = {...data[keys[1]], [keys[0]]:formObj[key]};
         }
-        console.log({data, smallestIndex});
-        console.log({actualData: data[smallestIndex]})
-        // const {fromDate, toDate, operator} = data[smallestIndex];
-        // setFromDate(fromDate);
-        // setToDate(toDate);
-        // setOperator(operator);
-        // setPopUpVisibility(false);
+        const finalData = data[smallestIndex];
+        if(!finalData)
+            return setPopUpVisibility(false)
+        const {fromDate, toDate, operator} = finalData;
+        setFromDate(fromDate);
+        setToDate(toDate);
+        setOperator(operator);
+        setPopUpVisibility(false);
     };
 
     return (
@@ -54,6 +54,7 @@ const Popup = ({sectionCount}) => {
                 </table>
                 <button type="submit">Ok</button>
             </form>
+            <button type="button" onClick={()=>setPopUpVisibility(false)}>cancel</button>
         </div>
     );
 };

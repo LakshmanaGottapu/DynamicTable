@@ -1,6 +1,9 @@
-import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import './index.css'
-import App from './App.jsx'
+import { ShipmentContextProvider } from './ShipmentContext'
+import App from './App'
+createRoot(document.getElementById('root')).render(
+    <ShipmentContextProvider>
+    <App />
+    </ShipmentContextProvider>
+)
 
-createRoot(document.getElementById('root')).render(<App />)
