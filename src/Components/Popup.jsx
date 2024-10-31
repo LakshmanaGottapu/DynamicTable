@@ -1,38 +1,39 @@
-import { useRef, useState } from "react";
-
-const Popup = () => {
-    // const { checkboxes, setCheckbox, dropdown, setDropdown, fromDate, toDate, setFromDate, setToDate, togglePopup, updateCheckbox,
-    //   updateDropdown,
-    //   updateFromDate,
-    //   updateDescription,
-    //   dropDownMap,
-    //   updateToDate, updateDatesForSmallestIndex, smallestIndexObject } = useStore();
-    const formRef = useRef(null);
-
-    // console.log("section", section)
-    // console.log("fromDate", fromDate)
-    // console.log("toDate", toDate)
-    // console.log("smallestIndexObject", smallestIndexObject)
-    const SECTIONS_COUNT = 5
-    const sections = useState(Array.from({length:SECTIONS_COUNT}, (_,i)=>i+1));
+import { ShipmentContext } from "../ShipmentContext";
+import PopupSection from "./PopupSection";
+import {useContext} from 'react';
+const Popup = ({sectionCount}) => {
+    const SECTIONS_COUNT = sectionCount || 5;
+    const sections = Array.from({length:SECTIONS_COUNT}, (_,i)=>i+1);
     console.log(sections);
-
+    const {setPopUpVisibility, setFromDate, setToDate, setOperator} = useContext(ShipmentContext);
     const handleOk = (e) => {
         e.preventDefault();
         const formData = new FormData(e.target);
         const formObj = {};
-        formData.entries().forEach(entry => {
-            formObj[entry[0]] = entry[1];
-            // console.log(entry);
-        })
-        console.log(formObj);
-      // togglePopup();
+        formData.entries().forEach(entry => formObj[entry[0]] = entry[1])
+        if(Object.entries(formObj).length===0)
+            return console.log('empty data')
+        const data = {};
+        let smallestIndex = Number.POSITIVE_INFINITY;
+        for(let key in formObj){
+            const keys = key.split('_');
+            if(keys[0] === 'checkbox')
+            smallestIndex = smallestIndex > keys[1] ? keys[1] : smallestIndex;
+            data[keys[1]] = {...data[keys[1]], [keys[0]]:formObj[key]};
+        }
+        console.log({data, smallestIndex});
+        console.log({actualData: data[smallestIndex]})
+        // const {fromDate, toDate, operator} = data[smallestIndex];
+        // setFromDate(fromDate);
+        // setToDate(toDate);
+        // setOperator(operator);
+        // setPopUpVisibility(false);
     };
 
     return (
         <div className="popup" style={{ width: '900px' }}>
             <h2>MultipleSelection</h2>
-            <form  onSubmit={handleOk} ref={formRef}>
+            <form  onSubmit={handleOk}>
                 <table>
                     <thead>
                         <tr>
@@ -46,22 +47,7 @@ const Popup = () => {
                     <tbody>
                         {
                             sections.map(value => (
-                                <tr key={value}>
-                                    <td>
-                                        <input type="checkbox" name={`checkbox_${value}`}/>
-                                    </td>
-                                    <td>
-                                        <select name={`dropdown_${value}`}>
-                                            <option value="" defaultValue={""}>Select</option>
-                                            <option value="[]">[]</option>
-                                            <option value="<">{'<'}</option>
-                                            <option value=">">{'>'}</option>
-                                            <option value="<=">{'<='}</option>
-                                            <option value="=">{'='}</option>
-                                            <option value=">=">{'>='}</option>
-                                        </select>
-                                    </td>
-                                </tr>
+                                <PopupSection key={value} id={value}/>
                             ))      
                         }
                     </tbody>
@@ -72,4 +58,4 @@ const Popup = () => {
     );
 };
 
-  export default Popup;
+export default Popup;
