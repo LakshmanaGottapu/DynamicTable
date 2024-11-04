@@ -5,30 +5,33 @@ import {Modal, Form} from 'antd';
 const Popup = ({sectionCount}) => {
     const SECTIONS_COUNT = sectionCount || 5;
     const sections = Array.from({length:SECTIONS_COUNT}, (_,i)=>i+1);
-    const {popUpVisibility, setPopUpVisibility, setFromDate, setToDate, setOperator} = useContext(ShipmentContext);
+    const {popUpVisibility, setPopUpVisibility, setFromDate, setToDate, setOperator, formatDate} = useContext(ShipmentContext);
     const [form] = Form.useForm();
     const handleOk = () => {     
         form
         .validateFields()
         .then(values => {
             console.log(values);
-            if(Object.entries(values).length===0)
-                return console.log('empty data')
+            if (Object.entries(values).length === 0) {
+                return console.log('empty data');
+            }
             let smallestIndex = 0;
-            for(let i=1; i<=SECTIONS_COUNT; i++){
-                if(values[`checkbox_${i}`] !== undefined){
+            for (let i = 1; i <= SECTIONS_COUNT; i++) {
+                if (values[`checkbox_${i}`] !== undefined && values[`checkbox_${i}`] === "") { // Use && for logical AND
                     smallestIndex = i;
                     break;
                 }
             }
+            console.log({ smallestIndex });
             console.log('checkbox: ' + values[`checkbox_${smallestIndex}`]);
             console.log('fromDate: ' + formatDate(values[`fromDate_${smallestIndex}`]));
             console.log('toDate: ' + formatDate(values[`toDate_${smallestIndex}`]));
-            setFromDate(`formData[fromDate_${smallestIndex}]`);
-            setToDate(toDate);
-            setOperator(operator);
+            if(smallestIndex>0 && smallestIndex<=SECTIONS_COUNT){
+                setFromDate(values[`fromDate_${smallestIndex}`]);
+                setToDate(values[`toDate_${smallestIndex}`]);
+            }
+            // Uncomment to close the modal
             setPopUpVisibility(false);
-            // onClose(); // Close the modal
         })
         .catch(errorInfo => {
             console.error('Validation Failed:', errorInfo);

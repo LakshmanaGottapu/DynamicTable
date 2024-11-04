@@ -5,14 +5,14 @@ import {DatePicker} from 'antd';
 import 'react-datepicker/dist/react-datepicker.css';
 import { ShipmentContext } from './ShipmentContext';
 function App() {
-  const {fromDate, setFromDate, toDate, setToDate, operator, popUpVisibility, setPopUpVisibility, formatDate} = useContext(ShipmentContext);
+  const {fromDate, setFromDate, toDate, setToDate, operator, popUpVisibility, setPopUpVisibility} = useContext(ShipmentContext);
   return (
       <div style={{display:'flex', flexDirection:'column'}}>
         <h3>POC:</h3>
         {/* <DatePicker selected = {fromDate} onChange={(date)=>setFromDate(date)}/> */}
         <DatePicker 
                     value={fromDate}
-                    onChange={(_,date)=>setFromDate(formatDate(date))}
+                    onChange={(date)=>setFromDate(date)}
                     format = 'DD/MM/YYYY'
                     placeholder="Select a date"
                 />
@@ -22,7 +22,7 @@ function App() {
         {/* <DatePicker selected = {toDate} onChange={(date)=>setToDate(date)}/> */}
         <DatePicker 
                     value={toDate}
-                    onChange={(_,date)=>setToDate(formatDate(date))}
+                    onChange={(date)=>setToDate(date)}
                     format = 'DD/MM/YYYY'
                     placeholder="Select a date"
                 />
