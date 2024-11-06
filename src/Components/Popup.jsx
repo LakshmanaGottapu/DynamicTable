@@ -55,7 +55,6 @@ const Popup = ({sectionCount}) => {
                         <th>from date</th>
                         <th>to date</th>
                         <th>description</th>
-
                     </thead>
                     <tbody>
                         {  
