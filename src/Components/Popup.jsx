@@ -28,6 +28,7 @@ const Popup = ({sectionCount}) => {
             console.log('toDate: ' + formatDate(values[`toDate_${smallestIndex}`]));
             if(smallestIndex>0 && smallestIndex<=SECTIONS_COUNT){
                 setFromDate(values[`fromDate_${smallestIndex}`]);
+                setOperator(values[`operator_${smallestIndex}`]);
                 setToDate(values[`toDate_${smallestIndex}`]);
             }
             // Uncomment to close the modal

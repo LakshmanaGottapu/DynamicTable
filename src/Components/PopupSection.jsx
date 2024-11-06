@@ -1,5 +1,5 @@
 import { useState, useContext } from 'react';
-import { Form, Input, DatePicker } from 'antd';
+import { Form, Input, DatePicker, Select } from 'antd';
 import { ShipmentContext } from '../ShipmentContext';
 function PopupSection({id}) {
     const [fromDate, setFromDate] = useState(null);
@@ -18,16 +18,15 @@ function PopupSection({id}) {
                 name={`operator_${id}`}
                 label="operator"
             >
-                <div className="dropdown">
-                    <button className="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenu2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        Dropdown
-                    </button>
-                    <div className="dropdown-menu" aria-labelledby="dropdownMenu2">
-                        <button className="dropdown-item" type="button">Action</button>
-                        <button className="dropdown-item" type="button">Another action</button>
-                        <button className="dropdown-item" type="button">Something else here</button>
-                    </div>
-                </div>
+                <Select
+                    onChange={(value) =>
+                        setDescription(operatorMap[value])
+                    }
+                >
+                    {
+                        Object.keys(operatorMap).map((key, index) =>  <Select.Option key={index} value={key}>{key}</Select.Option>)
+                    }
+                </Select>
             </Form.Item>
             <Form.Item 
                 name={`fromDate_${id}`}
@@ -51,6 +50,10 @@ function PopupSection({id}) {
                     placeholder="Select a date"
                 />
             </Form.Item>
+            <div style={{display:'flex', flexDirection:'column'}}>
+                <strong>Description</strong>
+                {description}
+            </div>
         </div>
     )
 }

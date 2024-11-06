@@ -1,34 +1,63 @@
 import { useContext } from 'react';
-import './App.css'
 import Popup from './Components/Popup'
-import {DatePicker} from 'antd';
-import 'react-datepicker/dist/react-datepicker.css';
+import {DatePicker, Select} from 'antd';
 import { ShipmentContext } from './ShipmentContext';
+import {Container, Row, Col} from 'react-bootstrap';
 function App() {
-  const {fromDate, setFromDate, toDate, setToDate, operator, popUpVisibility, setPopUpVisibility} = useContext(ShipmentContext);
+  const {fromDate, setFromDate, toDate, setToDate, operator, popUpVisibility, setPopUpVisibility, countries, legalEntities} = useContext(ShipmentContext);
   return (
-      <div style={{display:'flex', flexDirection:'column'}}>
-        <h3>POC:</h3>
-        {/* <DatePicker selected = {fromDate} onChange={(date)=>setFromDate(date)}/> */}
-        <DatePicker 
-                    value={fromDate}
-                    onChange={(date)=>setFromDate(date)}
-                    format = 'DD/MM/YYYY'
-                    placeholder="Select a date"
-                />
-        <h3>Operator:</h3> 
-        <p style={{minBlockSize:'1.5rem', border:'1px solid black', width:'3rem', padding:'0.25rem'}}>{operator}</p>
-        <h3>ToDate:</h3>
-        {/* <DatePicker selected = {toDate} onChange={(date)=>setToDate(date)}/> */}
-        <DatePicker 
-                    value={toDate}
-                    onChange={(date)=>setToDate(date)}
-                    format = 'DD/MM/YYYY'
-                    placeholder="Select a date"
-                />
+    <Container fluid='md'>
+      <Row>
+        <Col className="col-md-2">
+          <Select
+          >
+              {
+                countries.map((country, index) => <Select.Option key={index} value={country}>{country}</Select.Option>)
+              }
+          </Select>
+        </Col>
+      </Row>
+      <Row>
+        <Col md={8}>
+          <Select
+          >
+              {
+                legalEntities.map((entity, index) => <Select.Option key={index} value={entity}>{entity}</Select.Option>)
+              }
+          </Select>
+        </Col>
+      </Row>
+      <Row>
+        <Col>
+          <h4>POC:</h4>
+        </Col>
+        <Col>
+          <DatePicker 
+            value={fromDate}
+            onChange={(date)=>setFromDate(date)}
+            format = 'DD/MM/YYYY'
+            placeholder="Select a date"
+          />
+        </Col>
+        <Col>
+          <h4>Operator:</h4> 
+        </Col>
+        <Col >{operator}</Col>
+        <Col>
+          <h4>ToDate:</h4>
+        </Col>
+        <Col>
+          <DatePicker 
+            value={toDate}
+            onChange={(date)=>setToDate(date)}
+            format = 'DD/MM/YYYY'
+            placeholder="Select a date"
+          />
+        </Col>
         <button style={{width:'2rem', marginBlock:'1rem'}} onClick={()=>{setPopUpVisibility(prev => !prev)}}>link</button>
         { popUpVisibility && <Popup />}
-      </div>
+      </Row>
+    </Container>
   )
 }
 
