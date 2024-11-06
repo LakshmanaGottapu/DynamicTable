@@ -6,7 +6,7 @@ import {Container, Row, Col} from 'react-bootstrap';
 function App() {
   const {fromDate, setFromDate, toDate, setToDate, operator, popUpVisibility, setPopUpVisibility, countries, legalEntities} = useContext(ShipmentContext);
   return (
-    <Container fluid='md'>
+    <Container>
       <Row>
         <Col className="col-md-2">
           <Select

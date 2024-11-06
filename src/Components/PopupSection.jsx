@@ -7,54 +7,59 @@ function PopupSection({id}) {
     const [description, setDescription] = useState('');
     const {operatorMap} = useContext(ShipmentContext);
     return (
-        <div style={{display:'flex'}}>
-            <Form.Item
-                name={`checkbox_${id}`}
-                label="check"
-            >
-                <Input type='checkbox'/>
-            </Form.Item>
-            <Form.Item 
-                name={`operator_${id}`}
-                label="operator"
-            >
-                <Select
-                    onChange={(value) =>
-                        setDescription(operatorMap[value])
-                    }
+        <tr>
+            <td style={{margin:'1rem', border:'1px solid black'}}>
+                <Form.Item
+                    name={`checkbox_${id}`}
                 >
-                    {
-                        Object.keys(operatorMap).map((key, index) =>  <Select.Option key={index} value={key}>{key}</Select.Option>)
-                    }
-                </Select>
-            </Form.Item>
-            <Form.Item 
-                name={`fromDate_${id}`}
-                label="From Date"
-            >
-                <DatePicker 
-                    value={fromDate}
-                    onChange={(date)=>setFromDate(date)}
-                    format = 'DD/MM/YYYY'
-                    placeholder="Select a date"
-                />
-            </Form.Item>
-            <Form.Item 
-                name={`toDate_${id}`}
-                label="To Date"
-            >
-                <DatePicker
-                    selected={toDate}
-                    onChange={(  date)=>setToDate(date)}
-                    format = 'DD/MM/YYYY'
-                    placeholder="Select a date"
-                />
-            </Form.Item>
-            <div style={{display:'flex', flexDirection:'column'}}>
-                <strong>Description</strong>
-                {description}
-            </div>
-        </div>
+                    <Input type='checkbox'/>
+                </Form.Item>
+            </td>
+            <td>
+                <Form.Item 
+                    name={`operator_${id}`}
+                >
+                    <Select
+                        onChange={(value) =>
+                            setDescription(operatorMap[value])
+                        }
+                    >
+                        {
+                            Object.keys(operatorMap).map((key, index) =>  <Select.Option key={index} value={key}>{key}</Select.Option>)
+                        }
+                    </Select>
+                </Form.Item>
+            </td>
+            <td>
+                <Form.Item 
+                    name={`fromDate_${id}`}
+                >
+                    <DatePicker 
+                        value={fromDate}
+                        onChange={(date)=>setFromDate(date)}
+                        format = 'DD/MM/YYYY'
+                        placeholder="Select a date"
+                    />
+                </Form.Item>
+            </td>
+            <td>
+                <Form.Item 
+                    name={`toDate_${id}`}
+                >
+                    <DatePicker
+                        selected={toDate}
+                        onChange={(  date)=>setToDate(date)}
+                        format = 'DD/MM/YYYY'
+                        placeholder="Select a date"
+                    />
+                </Form.Item>
+            </td>
+            <td>
+                <div style={{display:'flex', flexDirection:'column'}}>
+                    {description}
+                </div>
+            </td>
+        </tr>
     )
 }
 

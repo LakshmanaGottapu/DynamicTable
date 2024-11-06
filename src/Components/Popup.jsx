@@ -41,18 +41,30 @@ const Popup = ({sectionCount}) => {
     
 
     return (
-        <Modal className="popup" style={{ width: '900px' }}
+        <Modal className="popup" 
             open = {popUpVisibility}
             onCancel = {()=>setPopUpVisibility(false)}
             onOk = {handleOk}
         >
             <h2>MultipleSelection</h2>
             <Form form={form} layout="vertical">
-                {  
-                    sections.map(value => (
-                        <PopupSection key={value} id={value}/>
-                    ))      
-                }
+                <table style={{textAlign:'center'}}>
+                    <thead>
+                        <th>checkbox</th>
+                        <th>operator</th>
+                        <th>from date</th>
+                        <th>to date</th>
+                        <th>description</th>
+
+                    </thead>
+                    <tbody>
+                        {  
+                            sections.map(value => (
+                                <PopupSection key={value} id={value}/>
+                            ))      
+                        }
+                    </tbody>
+                </table>
             </Form>
         </Modal>
     );
