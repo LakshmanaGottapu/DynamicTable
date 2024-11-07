@@ -21,7 +21,7 @@ const MyFormModal = ({ isVisible, onClose }) => {
   return (
     <Modal
       title="My Form Modal"
-      visible={isVisible}
+      open={isVisible}
       onOk={handleOk}
       onCancel={onClose}
     >

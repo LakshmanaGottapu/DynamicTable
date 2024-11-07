@@ -1,5 +1,5 @@
 import { useContext } from 'react';
-import Popup from './Components/Popup'
+import TableComponent from './Components/Popup'
 import {DatePicker, Select} from 'antd';
 import { ShipmentContext } from './ShipmentContext';
 import {Container, Row, Col} from 'react-bootstrap';
@@ -56,7 +56,7 @@ function App() {
           />
         </Col>
         <button style={{width:'2rem', marginBlock:'1rem'}} onClick={()=>{setPopUpVisibility(prev => !prev)}}>link</button>
-        { popUpVisibility && <Popup />}
+        {<TableComponent />}
       </Row>
     </Container>
   )
