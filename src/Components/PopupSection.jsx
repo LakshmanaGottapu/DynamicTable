@@ -4,7 +4,7 @@ import { ShipmentContext } from '../ShipmentContext';
 import styled from 'styled-components';
 const StyledFormItem = styled(Form.Item)`
         .ant-form-item-control-input {
-            border: none;
+            border: none !important;
             box-sizing: border-box;
         }
         margin: 0;
@@ -25,11 +25,11 @@ function PopupSection({id}) {
                     <Input type='checkbox'/>
                 </StyledFormItem>
             </td>
-            <td style={{border:'1px solid black'}}>
+            <td style={{border:'1px solid black', overflow:'hidden'}}>
                 <StyledFormItem 
                     name={`operator_${id}`}
                 >
-                    <Select
+                    <Select style={{transform:'translate(-40%,-10%)', transform:'scaleX(1.3)', transform:'scaleY(1.5)'}}
                         onChange={(value) =>
                             setDescription(operatorMap[value])
                         }
@@ -40,11 +40,11 @@ function PopupSection({id}) {
                     </Select>
                 </StyledFormItem>
             </td>
-            <td style={{border:'1px solid black'}}>
+            <td style={{border:'1px solid black', overflow:'hidden'}}>
                 <StyledFormItem 
                     name={`fromDate_${id}`}
                 >
-                    <DatePicker 
+                    <DatePicker style={{transform:'translate(-40%,-10%)', transform:'scale(1.2)'}}
                         value={fromDate}
                         onChange={(date)=>setFromDate(date)}
                         format = 'DD/MM/YYYY'
@@ -52,11 +52,11 @@ function PopupSection({id}) {
                     />
                 </StyledFormItem>
             </td>
-            <td style={{border:'1px solid black'}}>
+            <td style={{border:'1px solid black', overflow:'hidden'}}>
                 <StyledFormItem 
                     name={`toDate_${id}`}
                 >
-                    <DatePicker
+                    <DatePicker style={{transform:'translate(-40%,-10%)', transform:'scale(1.2)'}}
                         selected={toDate}
                         onChange={(  date)=>setToDate(date)}
                         format = 'DD/MM/YYYY'
@@ -64,10 +64,10 @@ function PopupSection({id}) {
                     />
                 </StyledFormItem>
             </td>
-            <td style={{border:'1px solid black'}}>
-                <div style={{display:'flex', flexDirection:'column'}}>
+            <td style={{border:'1px solid black', overflow:'hidden'}}>
+                <p style={{display:'flex', flexDirection:'column'}}>
                     {description}
-                </div>
+                </p>
             </td>
         </tr>
     )
