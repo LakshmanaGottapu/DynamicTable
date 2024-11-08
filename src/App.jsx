@@ -1,11 +1,11 @@
 import { useContext } from 'react';
-import TableComponent from './Components/Popup'
+import Popupsection from './Components/Popupsection'
 import {DatePicker, Select} from 'antd';
 import { ShipmentContext } from './ShipmentContext';
 import {Container, Row, Col} from 'react-bootstrap';
 
 function App() {
-  const {fromDate, setFromDate, toDate, setToDate, operator, popUpVisibility, setPopUpVisibility, countries, legalEntities} = useContext(ShipmentContext);
+  const { popupData,fromDate, setFromDate, toDate, setToDate, operator, setPopUpVisibility, countries, legalEntities } = useContext(ShipmentContext);
   return (
     <Container>
       <Row>
@@ -56,7 +56,12 @@ function App() {
           />
         </Col>
         <button style={{width:'2rem', marginBlock:'1rem'}} onClick={()=>{setPopUpVisibility(prev => !prev)}}>link</button>
-        {<TableComponent />}
+        {<Popupsection />}
+        {<div>
+            {
+              console.log(popupData)
+            }
+          </div>}
       </Row>
     </Container>
   )

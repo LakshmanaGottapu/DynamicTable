@@ -1,76 +1,156 @@
-import { useState, useContext } from 'react';
-import { Form, Input, DatePicker, Select } from 'antd';
+import {useState, useContext} from 'react'
+import { Modal, Table, Form, Select, DatePicker } from 'antd'
+import { useForm } from 'antd/es/form/Form';
 import { ShipmentContext } from '../ShipmentContext';
-import styled from 'styled-components';
-const StyledFormItem = styled(Form.Item)`
-        .ant-form-item-control-input {
-            border: none !important;
-            box-sizing: border-box;
-        }
-        margin: 0;
-        padding: 0;
-        `;
-function PopupSection({id}) {
-    const [fromDate, setFromDate] = useState(null);
-    const [toDate, setToDate] = useState(null);
-    const [description, setDescription] = useState('');
-    const {operatorMap} = useContext(ShipmentContext);
-    
-    return (
-        <tr>
-            <td style={{margin:'1rem', border:'1px solid black'}}>
-                <StyledFormItem
-                    name={`checkbox_${id}`}
+function Popupsection() {
+    const [selectedRowKeys, setSelectedRowKeys] = useState([]);
+    const [description, setDescription] = useState(new Map());
+    const [form] = useForm();
+    const SECTIONS_COUNT = 5;
+    const sections = Array.from({length:SECTIONS_COUNT}, (_,i)=>i+1)
+    const {setPopupData, popUpVisibility, setPopUpVisibility, operatorMap, fromDate, toDate, setFromDate, setToDate, setOperator} = useContext(ShipmentContext);
+
+    const columns = [
+        {
+            title: 'Operator',
+            dataIndex:'operator',
+            render: (text, record, index)=> {
+                return (
+                <Form.Item
+                    name={[index, 'operator']}
+                    style={{ display: 'inline-block', textAlign: 'center', width: '100%', margin: 0 }}
                 >
-                    <Input type='checkbox'/>
-                </StyledFormItem>
-            </td>
-            <td style={{border:'1px solid black', overflow:'hidden'}}>
-                <StyledFormItem 
-                    name={`operator_${id}`}
-                >
-                    <Select style={{transform:'translate(-40%,-10%)', transform:'scaleX(1.3)', transform:'scaleY(1.5)'}}
+                    <Select
                         onChange={(value) =>
-                            setDescription(operatorMap[value])
+                            setDescription(prev => {
+                                const newMap = new Map(prev)
+                                return newMap.set(index, operatorMap[value])
+                            })
                         }
                     >
                         {
                             Object.keys(operatorMap).map((key, index) =>  <Select.Option key={index} value={key}>{key}</Select.Option>)
                         }
                     </Select>
-                </StyledFormItem>
-            </td>
-            <td style={{border:'1px solid black', overflow:'hidden'}}>
-                <StyledFormItem 
-                    name={`fromDate_${id}`}
+                </Form.Item>
+            )}
+        },
+        {
+            title: 'From Date',
+            dataIndex:'fromDate',
+            render: (text, record, index)=> (
+                <Form.Item
+                initialValue={text}
+                style={{ display: 'inline-block', textAlign: 'center', width: '100%', margin: 0 }}
+                name={[index, 'fromDate']}
                 >
-                    <DatePicker style={{transform:'translate(-40%,-10%)', transform:'scale(1.2)'}}
-                        value={fromDate}
-                        onChange={(date)=>setFromDate(date)}
+                    <DatePicker
+                        
+                        style ={{margin: 0, border: record.isActive ? '1px solid black' : 'none'}}
                         format = 'DD/MM/YYYY'
-                        placeholder="Select a date"
+                        placeholder=""
                     />
-                </StyledFormItem>
-            </td>
-            <td style={{border:'1px solid black', overflow:'hidden'}}>
-                <StyledFormItem 
-                    name={`toDate_${id}`}
+                </Form.Item>
+            )
+        },
+        {
+            title: 'To Date',
+            dataIndex:'toDate',
+            render: (text, record, index)=> (
+                <Form.Item
+                initialValue={text}
+                name={[index, 'toDate']}
+                style={{ display: 'inline-block', textAlign: 'center', width: '100%', margin: 0 }}
                 >
-                    <DatePicker style={{transform:'translate(-40%,-10%)', transform:'scale(1.2)'}}
-                        selected={toDate}
-                        onChange={(  date)=>setToDate(date)}
+                    <DatePicker
+                        style ={{border: record.isActive ? '1px solid black' : 'none'}}
                         format = 'DD/MM/YYYY'
-                        placeholder="Select a date"
+                        placeholder=""
                     />
-                </StyledFormItem>
-            </td>
-            <td style={{border:'1px solid black', overflow:'hidden'}}>
-                <p style={{display:'flex', flexDirection:'column'}}>
-                    {description}
-                </p>
-            </td>
-        </tr>
+                </Form.Item>
+            )
+        },
+        {
+            title: 'Description',
+            dataIndex:'description',
+            render: (_, record, index)=> (
+                    <p style={{ display: 'inline-block', textAlign: 'center', margin: 0 }}>{description.get(index)}</p>
+            )
+        }
+    ]
+    const data = sections.map((_, i) => {
+        return ({
+            key: i,
+            operator: ``,
+            fromDate: i===0 ? fromDate : '',
+            toDate: i==0 ? toDate : '',
+            description: ''
+        })
+    })
+    
+    async function handleOk(){
+        const smallestRowKey = selectedRowKeys.reduce((prev, current)=>{
+            return prev < current ? prev : current
+        }, Number.POSITIVE_INFINITY)
+        if(smallestRowKey == Number.POSITIVE_INFINITY){
+            form.resetFields();
+            setDescription(new Map());    
+        }
+        await form.validateFields()
+            .then(values => {
+                const {operator, fromDate, toDate} = values[smallestRowKey];
+                setFromDate(fromDate)
+                setOperator(operator)
+                setToDate(toDate)
+                console.log(values);
+                const data = Object.values(values).filter(record => {
+                    const {operator, fromDate, toDate} = record;
+                    return (operator || fromDate || toDate)
+                }).map(record => {
+                    const {operator, fromDate, toDate} = record;
+                    if(operator === '[]'){
+                        return {
+                            operator, value:[fromDate, toDate]
+                        }
+                    }
+                    else{
+                        return {
+                            operator, value:[fromDate]
+                        }
+                    }
+                })
+                // const {operator, fromDate, toDate} = data[0];
+                // setFromDate(fromDate)
+                // setOperator(operator)
+                // setToDate(toDate)
+                // setPopupData(data);
+            })
+        setPopUpVisibility(false);
+    }
+    return (
+        <Modal 
+            width={900}
+            open = {popUpVisibility}
+            onCancel = {()=>setPopUpVisibility(false)}
+            onOk = {handleOk}
+        >
+            <h2 className="text-center">
+                Multi Selection
+            </h2>
+            <Form form={form} style={{marginBlock:'3rem'}}>
+                <Table
+                    dataSource={data}
+                    columns={columns}
+                    rowSelection={{selectedRowKeys, type:'checkbox', onChange:(selectedRowKeys)=>{
+                        setSelectedRowKeys(selectedRowKeys);
+                    }}}
+                    pagination={false}
+                    bordered={true}
+                >
+                </Table>
+            </Form>
+        </Modal>
     )
 }
 
-export default PopupSection
+export default Popupsection;

@@ -8,6 +8,7 @@ export function ShipmentContextProvider({children}){
     const [fromDate, setFromDate] = useState(null);
     const [toDate, setToDate] = useState(null);
     const [operator, setOperator] = useState('');
+    const [popupData, setPopupData] = useState([]);
     const [popUpVisibility, setPopUpVisibility] = useState(false);
     const operatorMap = {
         '[]' : 'In Between', '<' : 'Less Than', '=' : 'Equal To', '>' : 'Greater Than', '<=' : 'Less Than Or Equal To', '>=' : 'Greater Than Or Equal To'
@@ -22,7 +23,7 @@ export function ShipmentContextProvider({children}){
         return `${day}/${month}/${year}`;
     }
     const contextProps = {
-        fromDate, setFromDate, toDate, setToDate, operator, setOperator, popUpVisibility, setPopUpVisibility, operatorMap, formatDate, countries, legalEntities
+        popupData, setPopupData, fromDate, setFromDate, toDate, setToDate, operator, setOperator, popUpVisibility, setPopUpVisibility, operatorMap, formatDate, countries, legalEntities
     }
     return (
         <ShipmentContext.Provider value={contextProps}>
