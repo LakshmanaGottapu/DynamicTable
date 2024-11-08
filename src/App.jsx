@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import Popupsection from './Components/Popupsection'
+import PopupSect from './Components/PopupSect'
 import {DatePicker, Select} from 'antd';
 import {Container, Row, Col} from 'react-bootstrap';
 
@@ -7,7 +7,7 @@ function App() {
   const [fromDate, setFromDate] = useState(null);
   const [toDate, setToDate] = useState(null);
   const [operator, setOperator] = useState('');
-  const [popupData, setPopupData] = useState();
+  const [popupData, setPopupData] = useState([]);
   const [popUpVisibility, setPopUpVisibility] = useState(false);
   const operatorMap = {
       '[]' : 'In Between', '<' : 'Less Than', '=' : 'Equal To', '>' : 'Greater Than', '<=' : 'Less Than Or Equal To', '>=' : 'Greater Than Or Equal To'
@@ -43,7 +43,9 @@ function App() {
         <Col>
           <DatePicker 
             value={fromDate}
-            onChange={(date)=>setFromDate(date)}
+            onChange={(date)=>{
+              setFromDate(date);
+            }}
             format = 'DD/MM/YYYY'
             placeholder="Select a date"
           />
@@ -63,8 +65,20 @@ function App() {
             placeholder="Select a date"
           />
         </Col>
-        <button style={{width:'2rem', marginBlock:'1rem'}} onClick={()=>{setPopUpVisibility(prev => !prev)}}>link</button>
-        {<Popupsection setPopupData={setPopupData} popUpVisibility={popUpVisibility} setPopUpVisibility={setPopUpVisibility} operatorMap={operatorMap} fromDate={fromDate}    toDate={toDate} setFromDate={setFromDate} setToDate={setToDate} setOperator={setOperator} />}
+        <button style={{width:'2rem', marginBlock:'1rem'}} onClick={()=>{
+          if(!popUpVisibility && fromDate && toDate){
+              setPopupData(prev => {
+                const newPopupData = [...prev];
+                newPopupData.splice(0,1,{
+                  operator:'', value:[fromDate, toDate] 
+                })
+                return newPopupData;
+            })
+          }
+          setPopUpVisibility(prev => !prev)
+        }}>link</button>
+        {console.log({popupDataApp:popupData})}
+        {popUpVisibility && <PopupSect setPopupData={setPopupData} popUpVisibility={popUpVisibility} setPopUpVisibility={setPopUpVisibility} operatorMap={operatorMap} fromDate={fromDate} toDate={toDate} setFromDate={setFromDate} setToDate={setToDate} setOperator={setOperator} popupData={popupData}/>}
         <p>{JSON.stringify(popupData)}</p>
       </Row>
     </Container>

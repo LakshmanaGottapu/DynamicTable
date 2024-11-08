@@ -1,13 +1,25 @@
-import {useState, useContext} from 'react'
+import {useState, useMemo, useEffect} from 'react'
 import { Modal, Table, Form, Select, DatePicker } from 'antd'
 import { useForm } from 'antd/es/form/Form';
-function Popupsection({setPopupData, popUpVisibility, setPopUpVisibility, operatorMap, fromDate, toDate, setFromDate, setToDate, setOperator}) {
+function Popupsection({setPopupData, popUpVisibility, setPopUpVisibility, operatorMap, fromDate, toDate, setFromDate, setToDate, setOperator, popupData}) {
     const [selectedRowKeys, setSelectedRowKeys] = useState([]);
     const [description, setDescription] = useState(new Map());
     const [form] = useForm();
     const SECTIONS_COUNT = 5;
     const sections = Array.from({length:SECTIONS_COUNT}, (_,i)=>i+1)
-
+    useEffect(()=>{
+        console.log('modal mounted');
+        console.log({popupData});
+    },[popUpVisibility])
+    const data = useMemo(sections.map((_, i) => {
+        return ({
+            key: i,
+            operator: ``,
+            fromDate: (popupData && popupData[i]) ? popupData[i].value[0] : '',
+            toDate: (popupData && popupData[i]) ? popupData[i].value[1] : '',
+            description: ''
+        })
+    }), [popupData]);
     const columns = [
         {
             title: 'Operator',
@@ -19,13 +31,11 @@ function Popupsection({setPopupData, popUpVisibility, setPopUpVisibility, operat
                     style={{ display: 'inline-block', textAlign: 'center', width: '100%', margin: 0 }}
                 >
                     <Select
-                        
                         onChange={(value) => {
                                 setDescription(prev => {
                                     const newMap = new Map(prev)
                                     return newMap.set(index, operatorMap[value])
                                 })
-                                setOperator(value);
                             }
                         }
                     >
@@ -40,21 +50,12 @@ function Popupsection({setPopupData, popUpVisibility, setPopUpVisibility, operat
             title: 'From Date',
             dataIndex:'fromDate',
             render: (text, record, index)=> {
-                if(index===0){
-                    return (<DatePicker 
-                        value={fromDate}
-                        onChange={(date)=>setFromDate(date)}
-                        format = 'DD/MM/YYYY'
-                        placeholder="Select a date"
-                    />)
-                }
-                else
                 return (<Form.Item
-                initialValue={text}
                 style={{ display: 'inline-block', textAlign: 'center', width: '100%', margin: 0 }}
                 name={[index, 'fromDate']}
                 >
                     <DatePicker
+                        defaultPickerValue={text}
                         style ={{margin: 0, border: record.isActive ? '1px solid black' : 'none'}}
                         format = 'DD/MM/YYYY'
                         placeholder=""
@@ -66,21 +67,12 @@ function Popupsection({setPopupData, popUpVisibility, setPopUpVisibility, operat
             title: 'To Date',
             dataIndex:'toDate',
             render: (text, record, index)=> {
-                if(index===0)
-                    return (
-                        <DatePicker 
-                            value={toDate}
-                            onChange={(date)=>setToDate(date)}
-                            format = 'DD/MM/YYYY'
-                            placeholder="Select a date"
-                        />
-                    )
-                else return(<Form.Item
-                    initialValue={text}
+                return(<Form.Item
                     name={[index, 'toDate']}
                     style={{ display: 'inline-block', textAlign: 'center', width: '100%', margin: 0 }}
                 >
                     <DatePicker
+                        defaultPickerValue={text}
                         style ={{border: record.isActive ? '1px solid black' : 'none'}}
                         format = 'DD/MM/YYYY'
                         placeholder=""
@@ -96,15 +88,7 @@ function Popupsection({setPopupData, popUpVisibility, setPopUpVisibility, operat
             )
         }
     ]
-    const data = sections.map((_, i) => {
-        return ({
-            key: i,
-            operator: ``,
-            fromDate: i===0 ? fromDate : '',
-            toDate: i==0 ? toDate : '',
-            description: ''
-        })
-    })
+    
     
     async function handleOk(){
         await form.validateFields()
@@ -125,6 +109,8 @@ function Popupsection({setPopupData, popUpVisibility, setPopUpVisibility, operat
                         }
                     }
                 })
+                console.log({data});
+                // console.log(data[0]);
                 setPopupData(data);
             })
         setPopUpVisibility(false);
