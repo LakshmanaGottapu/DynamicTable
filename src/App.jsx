@@ -1,11 +1,19 @@
-import { useContext } from 'react';
+import { useState } from 'react';
 import Popupsection from './Components/Popupsection'
 import {DatePicker, Select} from 'antd';
-import { ShipmentContext } from './ShipmentContext';
 import {Container, Row, Col} from 'react-bootstrap';
 
 function App() {
-  const { popupData,fromDate, setFromDate, toDate, setToDate, operator, setPopUpVisibility, countries, legalEntities } = useContext(ShipmentContext);
+  const [fromDate, setFromDate] = useState(null);
+  const [toDate, setToDate] = useState(null);
+  const [operator, setOperator] = useState('');
+  const [popupData, setPopupData] = useState();
+  const [popUpVisibility, setPopUpVisibility] = useState(false);
+  const operatorMap = {
+      '[]' : 'In Between', '<' : 'Less Than', '=' : 'Equal To', '>' : 'Greater Than', '<=' : 'Less Than Or Equal To', '>=' : 'Greater Than Or Equal To'
+  }
+  const countries = ['USA', 'AUSTRALIA', 'INDIA', 'CHINA', 'KOREA']
+  const legalEntities = ['USA', 'AUSTRALIA', 'INDIA', 'CHINA', 'KOREA'];
   return (
     <Container>
       <Row>
@@ -56,12 +64,8 @@ function App() {
           />
         </Col>
         <button style={{width:'2rem', marginBlock:'1rem'}} onClick={()=>{setPopUpVisibility(prev => !prev)}}>link</button>
-        {<Popupsection />}
-        {<div>
-            {
-              console.log(popupData)
-            }
-          </div>}
+        {<Popupsection setPopupData={setPopupData} popUpVisibility={popUpVisibility} setPopUpVisibility={setPopUpVisibility} operatorMap={operatorMap} fromDate={fromDate}    toDate={toDate} setFromDate={setFromDate} setToDate={setToDate} setOperator={setOperator} />}
+        <p>{JSON.stringify(popupData)}</p>
       </Row>
     </Container>
   )

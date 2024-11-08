@@ -1,14 +1,12 @@
 import {useState, useContext} from 'react'
 import { Modal, Table, Form, Select, DatePicker } from 'antd'
 import { useForm } from 'antd/es/form/Form';
-import { ShipmentContext } from '../ShipmentContext';
-function Popupsection() {
+function Popupsection({setPopupData, popUpVisibility, setPopUpVisibility, operatorMap, fromDate, toDate, setFromDate, setToDate, setOperator}) {
     const [selectedRowKeys, setSelectedRowKeys] = useState([]);
     const [description, setDescription] = useState(new Map());
     const [form] = useForm();
     const SECTIONS_COUNT = 5;
     const sections = Array.from({length:SECTIONS_COUNT}, (_,i)=>i+1)
-    const {setPopupData, popUpVisibility, setPopUpVisibility, operatorMap, fromDate, toDate, setFromDate, setToDate, setOperator} = useContext(ShipmentContext);
 
     const columns = [
         {
@@ -21,11 +19,14 @@ function Popupsection() {
                     style={{ display: 'inline-block', textAlign: 'center', width: '100%', margin: 0 }}
                 >
                     <Select
-                        onChange={(value) =>
-                            setDescription(prev => {
-                                const newMap = new Map(prev)
-                                return newMap.set(index, operatorMap[value])
-                            })
+                        
+                        onChange={(value) => {
+                                setDescription(prev => {
+                                    const newMap = new Map(prev)
+                                    return newMap.set(index, operatorMap[value])
+                                })
+                                setOperator(value);
+                            }
                         }
                     >
                         {
@@ -38,37 +39,54 @@ function Popupsection() {
         {
             title: 'From Date',
             dataIndex:'fromDate',
-            render: (text, record, index)=> (
-                <Form.Item
+            render: (text, record, index)=> {
+                if(index===0){
+                    return (<DatePicker 
+                        value={fromDate}
+                        onChange={(date)=>setFromDate(date)}
+                        format = 'DD/MM/YYYY'
+                        placeholder="Select a date"
+                    />)
+                }
+                else
+                return (<Form.Item
                 initialValue={text}
                 style={{ display: 'inline-block', textAlign: 'center', width: '100%', margin: 0 }}
                 name={[index, 'fromDate']}
                 >
                     <DatePicker
-                        
                         style ={{margin: 0, border: record.isActive ? '1px solid black' : 'none'}}
                         format = 'DD/MM/YYYY'
                         placeholder=""
                     />
-                </Form.Item>
-            )
+                </Form.Item>)
+            }
         },
         {
             title: 'To Date',
             dataIndex:'toDate',
-            render: (text, record, index)=> (
-                <Form.Item
-                initialValue={text}
-                name={[index, 'toDate']}
-                style={{ display: 'inline-block', textAlign: 'center', width: '100%', margin: 0 }}
+            render: (text, record, index)=> {
+                if(index===0)
+                    return (
+                        <DatePicker 
+                            value={toDate}
+                            onChange={(date)=>setToDate(date)}
+                            format = 'DD/MM/YYYY'
+                            placeholder="Select a date"
+                        />
+                    )
+                else return(<Form.Item
+                    initialValue={text}
+                    name={[index, 'toDate']}
+                    style={{ display: 'inline-block', textAlign: 'center', width: '100%', margin: 0 }}
                 >
                     <DatePicker
                         style ={{border: record.isActive ? '1px solid black' : 'none'}}
                         format = 'DD/MM/YYYY'
                         placeholder=""
                     />
-                </Form.Item>
-            )
+                </Form.Item>)
+            }
         },
         {
             title: 'Description',
@@ -89,20 +107,8 @@ function Popupsection() {
     })
     
     async function handleOk(){
-        const smallestRowKey = selectedRowKeys.reduce((prev, current)=>{
-            return prev < current ? prev : current
-        }, Number.POSITIVE_INFINITY)
-        if(smallestRowKey == Number.POSITIVE_INFINITY){
-            form.resetFields();
-            setDescription(new Map());    
-        }
         await form.validateFields()
             .then(values => {
-                const {operator, fromDate, toDate} = values[smallestRowKey];
-                setFromDate(fromDate)
-                setOperator(operator)
-                setToDate(toDate)
-                console.log(values);
                 const data = Object.values(values).filter(record => {
                     const {operator, fromDate, toDate} = record;
                     return (operator || fromDate || toDate)
@@ -119,11 +125,7 @@ function Popupsection() {
                         }
                     }
                 })
-                // const {operator, fromDate, toDate} = data[0];
-                // setFromDate(fromDate)
-                // setOperator(operator)
-                // setToDate(toDate)
-                // setPopupData(data);
+                setPopupData(data);
             })
         setPopUpVisibility(false);
     }

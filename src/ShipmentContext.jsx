@@ -8,7 +8,7 @@ export function ShipmentContextProvider({children}){
     const [fromDate, setFromDate] = useState(null);
     const [toDate, setToDate] = useState(null);
     const [operator, setOperator] = useState('');
-    const [popupData, setPopupData] = useState([]);
+    const [popupData, setPopupData] = useState('');
     const [popUpVisibility, setPopUpVisibility] = useState(false);
     const operatorMap = {
         '[]' : 'In Between', '<' : 'Less Than', '=' : 'Equal To', '>' : 'Greater Than', '<=' : 'Less Than Or Equal To', '>=' : 'Greater Than Or Equal To'
