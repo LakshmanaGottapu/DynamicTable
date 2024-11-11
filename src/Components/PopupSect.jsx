@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { Modal, Table, Form, Select, DatePicker } from 'antd';
 import { useForm } from 'antd/es/form/Form';
 
-function PopupSect({ setPopupData, popUpVisibility, setPopUpVisibility, operatorMap, popupData, setFromDate, setToDate }) {
+function PopupSect({ setPopupData, popUpVisibility, setPopUpVisibility, operatorMap, popupData, setFromDate, setToDate, setOperator }) {
     const [selectedRowKeys, setSelectedRowKeys] = useState([]);
     const [description, setDescription] = useState(new Map());
     const [form] = useForm();
@@ -22,6 +22,7 @@ function PopupSect({ setPopupData, popUpVisibility, setPopUpVisibility, operator
             }, {});
             form.setFieldsValue(initialFormValues);
             console.log(popupData[0]);
+            setOperator(popupData[0].operator);
             setFromDate(popupData[0].value[0])
             setToDate(popupData[0].value[1])
         }
@@ -31,7 +32,7 @@ function PopupSect({ setPopupData, popUpVisibility, setPopUpVisibility, operator
     const data = useMemo(() => 
         sections.map((_, i) => ({
             key: i,
-            operator: '',
+            operator: form.getFieldValue([i, 'operator']) || null,
             fromDate: form.getFieldValue([i, 'fromDate']) || null,
             toDate: form.getFieldValue([i, 'toDate']) || null,
             description: description.get(i) || ''
@@ -48,6 +49,7 @@ function PopupSect({ setPopupData, popUpVisibility, setPopUpVisibility, operator
                     style={{ display: 'inline-block', textAlign: 'center', width: '100%', margin: 0 }}
                 >
                     <Select
+                        allowClear  
                         onChange={(value) => {
                             setDescription(prev => {
                                 const newMap = new Map(prev);
@@ -114,7 +116,10 @@ function PopupSect({ setPopupData, popUpVisibility, setPopUpVisibility, operator
                     return operator || fromDate || toDate;
                 }).map(record => {
                     const { operator, fromDate, toDate } = record;
-                    return { operator, value: [fromDate, toDate] };
+                    if(operator === '[]')
+                        return { operator, value: [fromDate, toDate] };
+                    else
+                        return {operator, value:[fromDate]};
                 });
                 setPopupData(data);
             });

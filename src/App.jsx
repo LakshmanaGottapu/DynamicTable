@@ -70,7 +70,7 @@ function App() {
               setPopupData(prev => {
                 const newPopupData = [...prev];
                 newPopupData.splice(0,1,{
-                  operator:'', value:[fromDate, toDate] 
+                  operator: operator? operator : '', value:[fromDate, toDate] 
                 })
                 return newPopupData;
             })
