@@ -2,32 +2,50 @@ import { useState, useEffect, useMemo } from 'react';
 import { Modal, Table, Form, Select, DatePicker } from 'antd';
 import { useForm } from 'antd/es/form/Form';
 
-function PopupSect({ setPopupData, popUpVisibility, setPopUpVisibility, operatorMap, popupData, setFromDate, setToDate, setOperator }) {
+function PopupSect({ setPopupData, popUpVisibility, setPopUpVisibility, operatorMap, popupData }) {
     const [selectedRowKeys, setSelectedRowKeys] = useState([]);
     const [description, setDescription] = useState(new Map());
     const [form] = useForm();
     const SECTIONS_COUNT = 5;
     const sections = Array.from({ length: SECTIONS_COUNT }, (_, i) => i + 1);
-
+    
     // Update form values whenever popupData changes
-    useEffect(() => {
-        if (popupData && popupData.length > 0) {
-            const initialFormValues = popupData.reduce((acc, item, index) => {
-                acc[index] = {
-                    operator: item.operator || '',
-                    fromDate: item.value[0] || null,
-                    toDate: item.value[1] || null
-                };
-                return acc;
-            }, {});
-            form.setFieldsValue(initialFormValues);
-            console.log(popupData[0]);
-            setOperator(popupData[0].operator);
-            setFromDate(popupData[0].value[0])
-            setToDate(popupData[0].value[1])
-        }
-    }, [popupData, form]);
-
+    // useEffect(() => {
+    //     console.log(popupData)
+    //     const {operator, value} =popupData[0];
+    //     const fromDate = value[0];
+    //     const toDate = value[1];
+    //     // console.log(operator, fromDate, toDate);
+    //     if (operator!=='' || toDate!=='' || fromDate!=='') {
+    //         const initialFormValues = popupData.reduce((acc, item, index) => {
+    //             acc[index] = {
+    //                 operator: item.operator || '',
+    //                 fromDate: item.value[0] || null,
+    //                 toDate: item.value[1] || null
+    //             };
+    //             return acc;
+    //         }, {});
+    //         form.setFieldsValue(initialFormValues);
+    //     }
+    // }, [popupData]);
+    async function handleOk() {
+        await form.validateFields()
+            .then(values => {
+                const data = Object.values(values).filter(record => {
+                    const { operator, fromDate, toDate } = record;
+                    return operator || fromDate || toDate;
+                }).map(record => {
+                    const { operator, fromDate, toDate } = record;
+                    if(operator === '[]')
+                        return { operator, value: [fromDate, toDate] };
+                    else
+                        return {operator, value:[fromDate]};
+                })
+                setPopupData(data);
+            })
+            form.resetFields();
+        setPopUpVisibility(false);
+    }
     // Use form values to ensure data updates reflect in the table
     const data = useMemo(() => 
         sections.map((_, i) => ({
@@ -108,24 +126,6 @@ function PopupSect({ setPopupData, popUpVisibility, setPopUpVisibility, operator
         }
     ];
 
-    async function handleOk() {
-        await form.validateFields()
-            .then(values => {
-                const data = Object.values(values).filter(record => {
-                    const { operator, fromDate, toDate } = record;
-                    return operator || fromDate || toDate;
-                }).map(record => {
-                    const { operator, fromDate, toDate } = record;
-                    if(operator === '[]')
-                        return { operator, value: [fromDate, toDate] };
-                    else
-                        return {operator, value:[fromDate]};
-                });
-                setPopupData(data);
-            });
-        setPopUpVisibility(false);
-    }
-
     return (
         <Modal
             width={900}
@@ -136,6 +136,7 @@ function PopupSect({ setPopupData, popUpVisibility, setPopUpVisibility, operator
             <h2 className="text-center">
                 Multi Selection
             </h2>
+            <p>{JSON.stringify(popupData)}</p>
             <Form form={form} style={{ marginBlock: '3rem' }}>
                 <Table
                     dataSource={data}

@@ -1,14 +1,35 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import PopupSect from './Components/PopupSect'
 import {DatePicker, Select} from 'antd';
 import {Container, Row, Col} from 'react-bootstrap';
 
 function App() {
-  const [fromDate, setFromDate] = useState(null);
-  const [toDate, setToDate] = useState(null);
-  const [operator, setOperator] = useState('');
-  const [popupData, setPopupData] = useState([]);
+  const [popupData, setPopupData] = useState([{operator:'',value:[null, null]}]);
   const [popUpVisibility, setPopUpVisibility] = useState(false);
+  // useEffect(()=>{
+  //   if(popUpVisibility){
+  //     setPopupData(prev => {
+  //       const newPopupData = [...prev];
+  //       newPopupData.splice(0,1,{
+  //         operator: operator? operator : '', value:[fromDate, toDate] 
+  //       })
+  //       return newPopupData;
+  //   })
+  // }
+  // },[popUpVisibility])
+  console.log('app');
+  function updateFromDate(date){
+    setPopupData(data => {
+      data[0].value[0] = date;
+      return [...data]
+    })
+  }
+  function updateToDate(date){
+    setPopupData(data => {
+      data[0].value[1] = date;
+      return [...data]
+    })
+  }
   const operatorMap = {
       '[]' : 'In Between', '<' : 'Less Than', '=' : 'Equal To', '>' : 'Greater Than', '<=' : 'Less Than Or Equal To', '>=' : 'Greater Than Or Equal To'
   }
@@ -42,10 +63,8 @@ function App() {
         </Col>
         <Col>
           <DatePicker 
-            value={fromDate}
-            onChange={(date)=>{
-              setFromDate(date);
-            }}
+            value={popupData[0].value[0]}
+            onChange={updateFromDate}
             format = 'DD/MM/YYYY'
             placeholder="Select a date"
           />
@@ -53,32 +72,21 @@ function App() {
         <Col>
           <h4>Operator:</h4> 
         </Col>
-        <Col >{operator}</Col>
+        <Col >{popupData[0].operator}</Col>
         <Col>
           <h4>ToDate:</h4>
         </Col>
         <Col>
           <DatePicker 
-            value={toDate}
-            onChange={(date)=>setToDate(date)}
+            value={popupData[0].value[1]}
+            onChange={updateToDate}
             format = 'DD/MM/YYYY'
             placeholder="Select a date"
           />
         </Col>
-        <button style={{width:'2rem', marginBlock:'1rem'}} onClick={()=>{
-          if(!popUpVisibility && fromDate && toDate){
-              setPopupData(prev => {
-                const newPopupData = [...prev];
-                newPopupData.splice(0,1,{
-                  operator: operator? operator : '', value:[fromDate, toDate] 
-                })
-                return newPopupData;
-            })
-          }
-          setPopUpVisibility(prev => !prev)
-        }}>link</button>
-        {console.log({popupDataApp:popupData})}
-        {popUpVisibility && <PopupSect setPopupData={setPopupData} popUpVisibility={popUpVisibility} setPopUpVisibility={setPopUpVisibility} operatorMap={operatorMap} fromDate={fromDate} toDate={toDate} setFromDate={setFromDate} setToDate={setToDate} setOperator={setOperator} popupData={popupData}/>}
+        <button style={{width:'2rem', marginBlock:'1rem'}} onClick={()=>setPopUpVisibility(true)}>link</button>
+        {/* {console.log({popupDataApp:popupData})} */}
+        {<PopupSect popupData={popupData} setPopupData={setPopupData} popUpVisibility={popUpVisibility} setPopUpVisibility={setPopUpVisibility} operatorMap={operatorMap} />}
         <p>{JSON.stringify(popupData)}</p>
       </Row>
     </Container>
