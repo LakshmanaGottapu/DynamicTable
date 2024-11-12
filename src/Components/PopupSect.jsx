@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Modal, Table, Form, Select, DatePicker } from 'antd';
 import { useForm } from 'antd/es/form/Form';
-
+import { dateToMomentConverter, momentToDateConverter } from '../utils';
 function PopupSect({ setPopupData, popUpVisibility, setPopUpVisibility, operatorMap, popupData }) {
     const [selectedRowKeys, setSelectedRowKeys] = useState([]);
     const [description, setDescription] = useState(new Map());
@@ -9,11 +9,18 @@ function PopupSect({ setPopupData, popUpVisibility, setPopUpVisibility, operator
     const SECTIONS_COUNT = 5;
     const sections = Array.from({ length: SECTIONS_COUNT }, (_, i) => i + 1);
     console.log("popup")
+    
     useEffect(()=>{
-        form.resetFields();
-        form.setFieldsValue(popupData.map(item => ({operator:item?.operator, fromDate:item?.value[0], toDate:item?.value[1]})));
-    },[popupData])
-
+            form.resetFields();
+            form.setFieldsValue(popupData.map(item => {
+                const {operator, value} = item;
+                    const fromDate = value[0] !==undefined && value[0] !==null ? dateToMomentConverter(value[0]) : null
+                    const toDate = value[1] !==undefined && value[1] !==null ? dateToMomentConverter(value[1]) : null
+                    return {operator, fromDate, toDate}
+                })
+            )
+        }, [popupData])
+        
     function handleOk() {
         form.validateFields()
             .then(values => {
@@ -23,9 +30,9 @@ function PopupSect({ setPopupData, popUpVisibility, setPopUpVisibility, operator
                 }).map(record => {
                     const { operator, fromDate, toDate } = record;
                     if(operator === '[]')
-                        return { operator, value: [fromDate, toDate] };
+                        return { operator, value: [momentToDateConverter(fromDate), momentToDateConverter(toDate)] };
                     else
-                        return {operator, value:[fromDate]};
+                        return {operator, value:[momentToDateConverter(fromDate)]};
                 })
                 setPopUpVisibility(false);
                 if(data.length > 0){

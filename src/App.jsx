@@ -2,14 +2,14 @@ import { useState } from 'react';
 import PopupSect from './Components/PopupSect'
 import {DatePicker, Select} from 'antd';
 import {Container, Row, Col} from 'react-bootstrap';
-
+import { dateToMomentConverter, momentToDateConverter } from './utils';
 function App() {
   const [popupData, setPopupData] = useState([{operator:'',value:[null, null]}]);
   const [popUpVisibility, setPopUpVisibility] = useState(false);
   console.log("app")
   function updateFromDate(date){
     setPopupData(data => {
-        data[0].value[0] = date;
+        data[0].value[0] = momentToDateConverter(date);
         return [...data];
     })
   }
@@ -18,12 +18,14 @@ function App() {
       console.log({data});
       const {operator} = data[0];
       if(operator=='' || operator =='[]'){
-        data[0].value[1] = date;
+        data[0].value[1] = momentToDateConverter(date);
         return [...data];
       }
       return data;
     })
   }
+  
+  
   const operatorMap = {
       '[]' : 'In Between', '<' : 'Less Than', '=' : 'Equal To', '>' : 'Greater Than', '<=' : 'Less Than Or Equal To', '>=' : 'Greater Than Or Equal To'
   }
@@ -57,7 +59,7 @@ function App() {
         </Col>
         <Col>
           <DatePicker 
-            value={popupData[0].value[0] || null}
+            value={popupData[0].value[0]!==null? dateToMomentConverter(popupData[0].value[0]) : null}
             onChange={updateFromDate}
             format = 'DD/MM/YYYY'
             placeholder="Select a date"
@@ -72,7 +74,7 @@ function App() {
         </Col>
         <Col>
           <DatePicker 
-            value={popupData[0].value[1] || null}
+            value={popupData[0].value[1]? dateToMomentConverter(popupData[0].value[1]) : null}
             onChange={updateToDate}
             format = 'DD/MM/YYYY'
             placeholder="Select a date"
