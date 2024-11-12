@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect } from 'react';
 import { Modal, Table, Form, Select, DatePicker } from 'antd';
 import { useForm } from 'antd/es/form/Form';
 
@@ -8,28 +8,14 @@ function PopupSect({ setPopupData, popUpVisibility, setPopUpVisibility, operator
     const [form] = useForm();
     const SECTIONS_COUNT = 5;
     const sections = Array.from({ length: SECTIONS_COUNT }, (_, i) => i + 1);
-    
-    // Update form values whenever popupData changes
-    // useEffect(() => {
-    //     console.log(popupData)
-    //     const {operator, value} =popupData[0];
-    //     const fromDate = value[0];
-    //     const toDate = value[1];
-    //     // console.log(operator, fromDate, toDate);
-    //     if (operator!=='' || toDate!=='' || fromDate!=='') {
-    //         const initialFormValues = popupData.reduce((acc, item, index) => {
-    //             acc[index] = {
-    //                 operator: item.operator || '',
-    //                 fromDate: item.value[0] || null,
-    //                 toDate: item.value[1] || null
-    //             };
-    //             return acc;
-    //         }, {});
-    //         form.setFieldsValue(initialFormValues);
-    //     }
-    // }, [popupData]);
-    async function handleOk() {
-        await form.validateFields()
+    console.log("popup")
+    useEffect(()=>{
+        form.resetFields();
+        form.setFieldsValue(popupData.map(item => ({operator:item?.operator, fromDate:item?.value[0], toDate:item?.value[1]})));
+    },[popupData])
+
+    function handleOk() {
+        form.validateFields()
             .then(values => {
                 const data = Object.values(values).filter(record => {
                     const { operator, fromDate, toDate } = record;
@@ -41,21 +27,27 @@ function PopupSect({ setPopupData, popUpVisibility, setPopUpVisibility, operator
                     else
                         return {operator, value:[fromDate]};
                 })
-                setPopupData(data);
+                setPopUpVisibility(false);
+                if(data.length > 0){
+                    setPopupData(data);
+                    const newMap = data.reduce((map, item, index) => {
+                        if(item && item.operator && item.operator !==''){
+                            map.set(index, operatorMap[item.operator])
+                        }
+                        return map;
+                    }, new Map())
+                    setDescription(newMap)
+                }
             })
-            form.resetFields();
-        setPopUpVisibility(false);
     }
-    // Use form values to ensure data updates reflect in the table
-    const data = useMemo(() => 
-        sections.map((_, i) => ({
-            key: i,
-            operator: form.getFieldValue([i, 'operator']) || null,
-            fromDate: form.getFieldValue([i, 'fromDate']) || null,
-            toDate: form.getFieldValue([i, 'toDate']) || null,
-            description: description.get(i) || ''
-        })),
-    [form, sections, description]);
+    
+    const data = sections.map((_, i) => ({
+        key: i,
+        operator: null,
+        fromDate: null,
+        toDate: null,
+        description: ''
+    }));
 
     const columns = [
         {

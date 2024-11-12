@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import PopupSect from './Components/PopupSect'
 import {DatePicker, Select} from 'antd';
 import {Container, Row, Col} from 'react-bootstrap';
@@ -6,28 +6,22 @@ import {Container, Row, Col} from 'react-bootstrap';
 function App() {
   const [popupData, setPopupData] = useState([{operator:'',value:[null, null]}]);
   const [popUpVisibility, setPopUpVisibility] = useState(false);
-  // useEffect(()=>{
-  //   if(popUpVisibility){
-  //     setPopupData(prev => {
-  //       const newPopupData = [...prev];
-  //       newPopupData.splice(0,1,{
-  //         operator: operator? operator : '', value:[fromDate, toDate] 
-  //       })
-  //       return newPopupData;
-  //   })
-  // }
-  // },[popUpVisibility])
-  console.log('app');
+  console.log("app")
   function updateFromDate(date){
     setPopupData(data => {
-      data[0].value[0] = date;
-      return [...data]
+        data[0].value[0] = date;
+        return [...data];
     })
   }
   function updateToDate(date){
     setPopupData(data => {
-      data[0].value[1] = date;
-      return [...data]
+      console.log({data});
+      const {operator} = data[0];
+      if(operator=='' || operator =='[]'){
+        data[0].value[1] = date;
+        return [...data];
+      }
+      return data;
     })
   }
   const operatorMap = {
@@ -63,7 +57,7 @@ function App() {
         </Col>
         <Col>
           <DatePicker 
-            value={popupData[0].value[0]}
+            value={popupData[0].value[0] || null}
             onChange={updateFromDate}
             format = 'DD/MM/YYYY'
             placeholder="Select a date"
@@ -78,16 +72,15 @@ function App() {
         </Col>
         <Col>
           <DatePicker 
-            value={popupData[0].value[1]}
+            value={popupData[0].value[1] || null}
             onChange={updateToDate}
             format = 'DD/MM/YYYY'
             placeholder="Select a date"
           />
         </Col>
         <button style={{width:'2rem', marginBlock:'1rem'}} onClick={()=>setPopUpVisibility(true)}>link</button>
-        {/* {console.log({popupDataApp:popupData})} */}
         {<PopupSect popupData={popupData} setPopupData={setPopupData} popUpVisibility={popUpVisibility} setPopUpVisibility={setPopUpVisibility} operatorMap={operatorMap} />}
-        <p>{JSON.stringify(popupData)}</p>
+        {(popupData[0].operator!=="" || popupData[0]?.value[0]!==null || popupData[0]?.value[1]!==null) && <p>{JSON.stringify(popupData)}</p>}
       </Row>
     </Container>
   )
