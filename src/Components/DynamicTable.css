@@ -1,0 +1,8 @@
+div.DynamicTable table th span {
+    font-weight: bold;
+}
+
+div.DynamicTable table tr > th:not(.ant-picker-content > thead > tr > th), div.DynamicTable table tr > td:not(.ant-picker-cell){
+    border: 1px solid rgba(225, 225, 225, 1);
+    background-color: white;
+}

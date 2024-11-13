@@ -3,10 +3,10 @@ import moment from 'moment'
 import { Row, Col, Container } from 'react-bootstrap'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faArrowUpRightFromSquare } from '@fortawesome/free-solid-svg-icons';
-import MomentDatePicker from '../CustomFormInputs/MomentDatePicker';
+import MomentDatePicker from './MomentDatePicker';
 import { useEffect, useState } from 'react';
-import DateEditor from '../DynamicTableEditors/DateEditor';
-import DynamicTable from '../DynamicTable';
+import DateEditor from './DateEditor';
+import DynamicTable from './DynamicTable';
 
 // import './RangeSelectorInput.css'
 
