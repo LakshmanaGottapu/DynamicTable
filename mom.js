@@ -1,6 +1,10 @@
-import moment from 'moment';
+// import moment from 'moment';
 
 // const date = new Date("2024-11-12")
-let mom = new moment("2024-11-12")
+// let mom = new moment("2024-11-12")
 
-console.log(mom)
+// console.log(mom)
+
+const array = ["hello"];
+
+console.log(array.pop());

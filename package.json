@@ -10,8 +10,15 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@devexpress/dx-react-grid": "^4.0.10",
+    "@devexpress/dx-react-grid-export": "^4.0.10",
+    "@devexpress/dx-react-grid-material-ui": "^4.0.10",
+    "@emotion/react": "^11.13.3",
+    "@emotion/styled": "^11.13.0",
+    "@mui/material": "^6.1.7",
     "antd": "^5.21.6",
     "bootstrap": "^5.3.3",
+    "file-saver": "^2.0.5",
     "moment": "^2.30.1",
     "react": "^18.3.1",
     "react-bootstrap": "^2.10.5",

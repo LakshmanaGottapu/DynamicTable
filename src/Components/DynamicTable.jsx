@@ -114,7 +114,7 @@ const DynamicTable = ({
         if (added) {
           newRows = [
             ...rows,
-            ...added.map((row, index) => (row[idColumn.name] = new) && (changedRows.push({action:'added', item: row}) && {
+            ...added.map((row, index) => (row[idColumn.name] = 'new') && (changedRows.push({action:'added', item: row}) && {
               ...row,
             })),
           ];
