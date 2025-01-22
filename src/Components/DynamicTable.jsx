@@ -1,5 +1,6 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { EditingState, SortingState, FilteringState, IntegratedSorting, IntegratedFiltering, SelectionState, DataTypeProvider, IntegratedSelection, GroupingState, SummaryState, IntegratedGrouping, IntegratedSummary } from '@devexpress/dx-react-grid';
+import { Select } from 'antd';
 import {
     Grid,
     TableHeaderRow,
@@ -62,7 +63,30 @@ const DynamicTable = ({
     const [idColumn, setIdColumn] = useState({});
     const [hiddenColumnNames, setHiddenColumnNames] = useState(columns.filter(col => col.visible == false).map(col => col.name));
     const [groups, setGroups] = useState(grouping);
-
+    const OccupationFormatter = (formatObject) => {
+        // console.log({ formatObject })
+        const { column, row, value } = formatObject
+        return (<span style={{color:'green'}}>{value}</span>)
+    }
+    const OccupationEditor = (editObject) => {
+        const { value, onValueChange, autoFocus, row, column, disabled, onBlur, onFocus,onKeyDown, } = editObject
+        console.log({editObject})
+        return (
+            <Select defaultValue={value} 
+                onChange={onValueChange}
+            >
+                <Select.Option value={"software engineer"}>software engineer</Select.Option>
+                <Select.Option value={"banker"}>banker</Select.Option>
+                <Select.Option value={"pilot"}>pilot</Select.Option>
+            </Select>
+        )
+    }
+    const OccupationDataTypeProvider = (props) => {
+        // console.log({props})
+        return (
+            <DataTypeProvider formatterComponent={OccupationFormatter} editorComponent={OccupationEditor} {...props} />
+        )
+    }
     const exporterRef = useRef(null);
     const [columnsToExport, setColumnsToExport] = useState([]);
 
@@ -179,7 +203,9 @@ const DynamicTable = ({
         pasteData = null;
     };
 
-    const RenderCell = ({ onClick, ...restProps }) => {        
+    const RenderCell = ({ onClick, ...restProps }) => {  
+        const {children, row, column, value}  = restProps  
+        console.log(restProps);  
         const isDisabled = restProps.row && restProps.column && restProps.column.name && isCellDisabled({rowId: getRowId(restProps.row), columnName:restProps.column.name});
         const isInError = restProps.row && restProps.column && restProps.column.name && errorCells.filter(ec => ec.columnName ? ec.columnName == restProps.column.name && ec.rowId == getRowId(restProps.row) : ec.rowId == getRowId(restProps.row)).length > 0;
         const filteredCellStyleObjs = restProps.row && restProps.column && restProps.column.name && cellStyles.filter(cs => cs.columnName ? cs.columnName == restProps.column.name && cs.rowId == getRowId(restProps.row) : cs.rowId == getRowId(restProps.row))
@@ -187,7 +213,8 @@ const DynamicTable = ({
         const cellStyle = filteredCellStyleObjs && filteredCellStyleObjs.length > 0 && filteredCellStyleObjs[0].style ? filteredCellStyleObjs[0].style : {}
         return (
             <VirtualTable.Cell {...restProps} style={{ backgroundColor: isDisabled && enableEdit ? "#E6E6E6":"#FFFFFF", border: isInError ? "2px solid #FF0000" : undefined, ...cellStyle, ...restProps.style}} tabIndex={0} onFocus={onClick}>
-                {restProps.column.renderValue ? restProps.column.renderValue(restProps.row) : restProps.value}
+                {/* {column.renderValue ? column.renderValue(row) : restProps.value} */}
+                {children }
             </VirtualTable.Cell>
         )
     };
@@ -260,6 +287,7 @@ const DynamicTable = ({
                 <IntegratedGrouping />
                 <IntegratedSummary />
                 <IntegratedFiltering />
+                <OccupationDataTypeProvider for={['occupation']}/>
                 <Plugin name="providers">
                     {columns.map((col) => {
                         if (col.editor) {

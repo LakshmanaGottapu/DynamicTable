@@ -5,10 +5,10 @@ import {createBrowserRouter, RouterProvider} from "react-router-dom";
 import TableWrapper from "./Components/TableWrapper";
 import SampleTable from "./Components/SampleTable";
 const router = createBrowserRouter([
-    // {
-    //     path: "/",
-    //     element: <TableWrapper/> 
-    // },
+    {
+        path: "/table",
+        element: <TableWrapper/> 
+    },
     {
         path:"/",
         element:<SampleTable/>
