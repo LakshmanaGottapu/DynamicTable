@@ -2,8 +2,8 @@ import React, { useState } from 'react'
 import SampleTable from '../Components/SampleTable'
 function Citizens() {
     const columns = [
-        { name: "id", title: "ID", isId: true, align: 'left', width:'75px' },
-        { name: 'username', title: "UserName", editingEnabled: false, width: '20rem', align: 'left' },
+        { name: "id", title: "ID", align: 'left', width:'75px' },
+        { name: 'username', title: "UserName", editingEnabled: false, width: '20rem', align: 'center' },
         {   name: "age", 
             title: "Age",
             sortingEnabled:true, 
@@ -15,14 +15,17 @@ function Citizens() {
             //             autoFocus
             //         />)
             // },
+            renderValue: (row) => {
+                return (<span>{row.value} years</span>)
+            },
             align:'left',
             width:'100px'
         },
-        { name: "occupation", title: "Occupation", align: 'left',
-            editor: (params) => {
+        { name: "occupation", title: "Occupation", align: 'center',
+            editor: (cellData) => {
                 return (
                     <select style={{ color: 'red'}}
-                        value={params.cellData}
+                        value={cellData}
                         autoFocus
                     >
                         <option value={"Software Engineer"}>Software Engineer</option>
@@ -42,7 +45,6 @@ function Citizens() {
         { id: 4, username: "Premchand", age: 29, occupation: "Embedded Engineer" }
     ])
   return (
-    
         <SampleTable columns={columns} rows={rows} setRows={setRows}/>
   )
 }

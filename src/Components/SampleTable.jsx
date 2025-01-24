@@ -1,14 +1,21 @@
-import { useState } from 'react'
-import { EditingState, SortingState, TableInlineCellEditing, IntegratedSorting } from "@devexpress/dx-react-grid";
+import { useMemo, useState } from 'react'
+import { EditingState, SortingState, TableInlineCellEditing, IntegratedSorting, DataTypeProvider } from "@devexpress/dx-react-grid";
 import { Grid, Table, TableHeaderRow, TableEditRow } from "@devexpress/dx-react-grid-material-ui";
 
-const getRowId = row => row.id
 function SampleTable({columns, rows, setRows}) {
+    const idColumn = useMemo(()=>columns.filter(column => column.name=='id' || column.isId)[0],[]);
+    const getRowId = row => row[idColumn.name]
+    const extensions = useMemo(() => columns.reduce((accumulator, column) => {
+            accumulator.columnExtensions.push({columnName:column.name, align:column.align, width:column.width});
+            accumulator.sortingStateColumnExtensions.push({columnName:column.name, sortingEnabled:Boolean(column.sortingEnabled)})
+            accumulator.editColumnExtensions.push({columnName:column.name, editingEnabled:column.name==idColumn.name ? false : (column.editingEnabled==undefined ? true : Boolean(column.editingEnabled))})
+            if(column.renderValue)
+                accumulator.dataProviders.push(<DataTypeProvider formatterComponent={column.renderValue} for={[column.name]}/>)
+            return accumulator;
+        },{columnExtensions:[], sortingStateColumnExtensions:[], dataProviders:[], editColumnExtensions:[]})
+    ,[])
+    
     const [editingCells, setEditingCells] = useState([])
-    // const [sortingState, setSortingState] = useState([])
-    const [sortingStateColumnExtensions] = useState(columns.map(column => ({columnName:column.name, sortingEnabled:Boolean(column.sortingEnabled)})))
-    // console.log(sortingStateColumnExtensions);
-    // const [sortingStateColumnExtensions] = useState([{columnName:'age', sortingEnabled:!(!column.sortingEnabled)}])
     function rowChange(row, value, columnName) {
         const newRows = rows.map(r => r.id === row.id ? { ...r, [columnName]: value } : r)
         setRows(newRows);
@@ -22,7 +29,7 @@ function SampleTable({columns, rows, setRows}) {
             </Table.Cell>
         )
     }
-    const renderEditableCell = ({ row, column, value, editingEnabled, onValueChange, autoFocus, onFocus, onBlur, onKeyDown }) => {
+    const renderEditableCell = ({ children, row, column, value, editingEnabled, onValueChange, autoFocus, onFocus, onBlur, onKeyDown }) => {
         function commit() {
             onValueChange(cellData)
             setEditingCells([])
@@ -30,13 +37,13 @@ function SampleTable({columns, rows, setRows}) {
         const [cellData, setCellData] = useState(value);
         if (column.editor)
             return (
-                <Table.Cell 
+                <Table.Cell style={{textAlign: column.align, border: '1px solid black' }}
                     onKeyDown={(e) => e.code == "Enter" ? commit() : null}
                     onBlur={commit}
                     onChange={(e) => setCellData(e.target.value)}
                     onFocus={onFocus}
                 >
-                    {column.editor({row, cellData, autoFocus})}
+                    {column.editor(cellData)}
                 </Table.Cell>
             )
         return (
@@ -53,9 +60,10 @@ function SampleTable({columns, rows, setRows}) {
     function checkDisabledRows(cells) {
         const newCells = cells.filter(cell => {
             const col = columns.filter(column => column.name == cell.columnName)[0]
-            return !col.isId && (col.editingEnabled == undefined ? true : col.editingEnabled)
+            return !col.isId && col.name!==idColumn.name && (col.editingEnabled == undefined ? true : col.editingEnabled)
         })
-        setEditingCells(newCells);
+        if(newCells.length > 0)
+            setEditingCells(newCells);
     }
     return (
         <Grid
@@ -63,15 +71,15 @@ function SampleTable({columns, rows, setRows}) {
             columns={columns}
             getRowId={getRowId}
         >
+            {extensions.dataProviders}
             <SortingState 
-                // sorting={sortingState} 
-                // onSortingChange={setSortingState}
-                columnExtensions={sortingStateColumnExtensions}
+                columnExtensions={extensions.sortingStateColumnExtensions}
             />
             <IntegratedSorting />
-            <Table cellComponent={RenderCell} />
+            <Table columnExtensions={extensions.columnExtensions} cellComponent={RenderCell}/>
             <TableHeaderRow showSortingControls/>
             <EditingState
+                columnExtensions={extensions.editColumnExtensions}
                 editingCells={editingCells}
                 onEditingCellsChange={checkDisabledRows}
                 createRowChange={rowChange}
