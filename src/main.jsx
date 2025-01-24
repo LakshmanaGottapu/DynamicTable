@@ -3,7 +3,7 @@ import App from './App';
 import Datepicker from "./Components/Datepicker";
 import {createBrowserRouter, RouterProvider} from "react-router-dom";
 import TableWrapper from "./Components/TableWrapper";
-import SampleTable from "./Components/SampleTable";
+import CitizenTable from "./Pages/CitizenTable";
 const router = createBrowserRouter([
     {
         path: "/table",
@@ -11,7 +11,7 @@ const router = createBrowserRouter([
     },
     {
         path:"/",
-        element:<SampleTable/>
+        element:<CitizenTable/>
     },
     {
         path: "/date",
