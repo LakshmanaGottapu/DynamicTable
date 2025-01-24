@@ -1,10 +1,14 @@
 import { useState } from 'react'
-import { EditingState, TableInlineCellEditing } from "@devexpress/dx-react-grid";
+import { EditingState, SortingState, TableInlineCellEditing, IntegratedSorting } from "@devexpress/dx-react-grid";
 import { Grid, Table, TableHeaderRow, TableEditRow } from "@devexpress/dx-react-grid-material-ui";
 
 const getRowId = row => row.id
 function SampleTable({columns, rows, setRows}) {
     const [editingCells, setEditingCells] = useState([])
+    // const [sortingState, setSortingState] = useState([])
+    const [sortingStateColumnExtensions] = useState(columns.map(column => ({columnName:column.name, sortingEnabled:Boolean(column.sortingEnabled)})))
+    // console.log(sortingStateColumnExtensions);
+    // const [sortingStateColumnExtensions] = useState([{columnName:'age', sortingEnabled:!(!column.sortingEnabled)}])
     function rowChange(row, value, columnName) {
         const newRows = rows.map(r => r.id === row.id ? { ...r, [columnName]: value } : r)
         setRows(newRows);
@@ -59,8 +63,14 @@ function SampleTable({columns, rows, setRows}) {
             columns={columns}
             getRowId={getRowId}
         >
+            <SortingState 
+                // sorting={sortingState} 
+                // onSortingChange={setSortingState}
+                columnExtensions={sortingStateColumnExtensions}
+            />
+            <IntegratedSorting />
             <Table cellComponent={RenderCell} />
-            <TableHeaderRow />
+            <TableHeaderRow showSortingControls/>
             <EditingState
                 editingCells={editingCells}
                 onEditingCellsChange={checkDisabledRows}

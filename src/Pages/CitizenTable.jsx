@@ -5,7 +5,8 @@ function Citizens() {
         { name: "id", title: "ID", isId: true, align: 'left', width:'75px' },
         { name: 'username', title: "UserName", editingEnabled: false, width: '20rem', align: 'left' },
         {   name: "age", 
-            title: "Age", 
+            title: "Age",
+            sortingEnabled:true, 
             // editor: (params) => {
             //     console.log(params)
             //     return (
@@ -36,7 +37,7 @@ function Citizens() {
         }
     ]
     const [rows, setRows] = useState([
-        { id: 1, username: "Lakshman", age: 28, occupation: "Software Engineer" },
+        { id: 1, username: "Lakshman", age: 30, occupation: "Software Engineer" },
         { id: 2, username: "Prasanth", age: 28, occupation: "Driving Instructor" },
         { id: 4, username: "Premchand", age: 29, occupation: "Embedded Engineer" }
     ])
