@@ -1,10 +1,11 @@
 import { useMemo, useState } from 'react'
-import { EditingState, SortingState, TableInlineCellEditing, IntegratedSorting, DataTypeProvider } from "@devexpress/dx-react-grid";
-import { Grid, Table, TableHeaderRow, TableEditRow } from "@devexpress/dx-react-grid-material-ui";
+import { EditingState, SortingState, TableInlineCellEditing, IntegratedSorting, DataTypeProvider, PagingState, IntegratedPaging } from "@devexpress/dx-react-grid";
+import { Grid, Table, TableHeaderRow, TableEditRow, PagingPanel } from "@devexpress/dx-react-grid-material-ui";
 
-function SampleTable({columns, rows, setRows}) {
+function SampleTable({columns, data}) {
     const idColumn = useMemo(()=>columns.filter(column => column.name=='id' || column.isId)[0],[]);
     const getRowId = row => row[idColumn.name]
+    const [rows, setRows] = useState(data);
     const extensions = useMemo(() => columns.reduce((accumulator, column) => {
             accumulator.columnExtensions.push({columnName:column.name, align:column.align, width:column.width});
             accumulator.sortingStateColumnExtensions.push({columnName:column.name, sortingEnabled:Boolean(column.sortingEnabled)})
@@ -76,6 +77,11 @@ function SampleTable({columns, rows, setRows}) {
                 columnExtensions={extensions.sortingStateColumnExtensions}
             />
             <IntegratedSorting />
+            <PagingState
+                defaultCurrentPage={0}
+                defaultPageSize={5}
+            />
+            <IntegratedPaging />
             <Table columnExtensions={extensions.columnExtensions} cellComponent={RenderCell}/>
             <TableHeaderRow showSortingControls/>
             <EditingState
@@ -83,8 +89,9 @@ function SampleTable({columns, rows, setRows}) {
                 editingCells={editingCells}
                 onEditingCellsChange={checkDisabledRows}
                 createRowChange={rowChange}
-            />
+                />
             <TableInlineCellEditing cellComponent={renderEditableCell} />
+                <PagingPanel pageSizes={[5, 10, 15]} />
         </Grid>
     )
 }
