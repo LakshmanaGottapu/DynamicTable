@@ -12,11 +12,13 @@ function TableWrapper() {
       { id: 2, username: "Prasanth", age: 28, occupation: "Driving Instructor" },
       { id: 4, username: "Premchand", age: 29, occupation: "Embedded Engineer" }
     ]
+
   return (
     <DynamicTable
       columns={columns}
       data={rows}
       enableEdit={true}
+      radioSelection={true}
     />
   )
 }

@@ -1,7 +1,8 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { EditingState, SortingState, FilteringState, IntegratedSorting, IntegratedFiltering, SelectionState, DataTypeProvider, IntegratedSelection, GroupingState, SummaryState, IntegratedGrouping, IntegratedSummary } from '@devexpress/dx-react-grid';
-import { Select } from 'antd';
+import { Input, Select } from 'antd';
 import {
+    Table,
     Grid,
     TableHeaderRow,
     TableFilterRow,
@@ -25,7 +26,7 @@ import saveAs from 'file-saver';
 
 import "./DynamicTable.css"
 
-const Root = props => <Grid.Root {...props} style={{height: '100%'}} />;
+const Root = props => <Grid.Root {...props} style={{ height: '100%' }} />;
 
 const onSave = (workbook) => {
     return workbook.xlsx.writeBuffer().then((buffer) => {
@@ -33,28 +34,29 @@ const onSave = (workbook) => {
     });
 };
 
-const DynamicTable = ({ 
-    columns, 
-    data, 
-    onDataChange, 
-    leftColumns = [], 
-    cellStyles =[], 
-    disabledCells = [], 
+const DynamicTable = ({
+    columns,
+    data,
+    onDataChange,
+    leftColumns = [],
+    cellStyles = [],
+    disabledCells = [],
     errorCells = [],
     grouping = [],
     groupSummaryItems = [],
     totalSummaryItems = [],
-    onSelectedRowsChange = false, 
-    selectedRows = false, 
-    enableFilterRow = false, 
-    enableEdit = false, 
-    enableAdd = false, 
-    enableDelete = false, 
-    enableToolbar = true, 
-    enableSortingControls = true 
+    onSelectedRowsChange = (e) => { console.log(e) },
+    selectedRows = false,
+    enableFilterRow = false,
+    enableEdit = false,
+    enableAdd = false,
+    enableDelete = false,
+    enableToolbar = true,
+    enableSortingControls = true,
+    radioSelection = false
 }) => {
 
-    if(onDataChange == undefined)  onDataChange = (changedRows) => {};
+    if (onDataChange == undefined) onDataChange = (changedRows) => { };
 
     const [rows, setRows] = useState(data);
     const [editingCells, setEditingCells] = useState([]);
@@ -64,15 +66,13 @@ const DynamicTable = ({
     const [hiddenColumnNames, setHiddenColumnNames] = useState(columns.filter(col => col.visible == false).map(col => col.name));
     const [groups, setGroups] = useState(grouping);
     const OccupationFormatter = (formatObject) => {
-        // console.log({ formatObject })
         const { column, row, value } = formatObject
-        return (<span style={{color:'green'}}>{value}</span>)
+        return (<span style={{ color: 'green' }}>{value}</span>)
     }
     const OccupationEditor = (editObject) => {
-        const { value, onValueChange, autoFocus, row, column, disabled, onBlur, onFocus,onKeyDown, } = editObject
-        console.log({editObject})
+        const { value, onValueChange, autoFocus, row, column, disabled, onBlur, onFocus, onKeyDown, } = editObject
         return (
-            <Select defaultValue={value} 
+            <Select defaultValue={value}
                 onChange={onValueChange}
             >
                 <Select.Option value={"software engineer"}>software engineer</Select.Option>
@@ -82,7 +82,6 @@ const DynamicTable = ({
         )
     }
     const OccupationDataTypeProvider = (props) => {
-        // console.log({props})
         return (
             <DataTypeProvider formatterComponent={OccupationFormatter} editorComponent={OccupationEditor} {...props} />
         )
@@ -108,11 +107,11 @@ const DynamicTable = ({
     }
     const isCellDisabled = ({ rowId, columnName }) => {
         return disabledCells.filter(dc => dc.columnName ? columnName == dc.columnName && rowId == dc.rowId : dc.rowId == rowId).length > 0 ||
-                columns.filter(col => col.editingEnabled == false && col.name == columnName).length > 0
+            columns.filter(col => col.editingEnabled == false && col.name == columnName).length > 0
     }
 
     useEffect(() => {
-        if (Array.isArray(selectedRows)){
+        if (Array.isArray(selectedRows)) {
             setSelection(selectedRows.map(r => r[idColumn.name]));
         }
     }, [selectedRows])
@@ -136,19 +135,19 @@ const DynamicTable = ({
         let newRows;
         let changedRows = [];
         if (added) {
-          newRows = [
-            ...rows,
-            ...added.map((row, index) => (row[idColumn.name] = 'new') && (changedRows.push({action:'added', item: row}) && {
-              ...row,
-            })),
-          ];
+            newRows = [
+                ...rows,
+                ...added.map((row, index) => (row[idColumn.name] = 'new') && (changedRows.push({ action: 'added', item: row }) && {
+                    ...row,
+                })),
+            ];
         }
         if (changed) {
             const changedRowKeys = Object.keys(changed);
             const firstRowChanges = changedRowKeys[0] && changed[changedRowKeys[0]] ? Object.keys(changed[changedRowKeys[0]]) : [];
 
             if (
-                pasteData && 
+                pasteData &&
                 (pasteData.includes("\n") || pasteData.includes("\t")) &&
                 changedRowKeys.length == 1 &&
                 (editingCells.length == 1 || firstRowChanges.length == 1)
@@ -159,16 +158,16 @@ const DynamicTable = ({
                 }
 
                 const changedRowIdValue = changedRowKeys[0];
-                let rowIndex = rows.indexOf(rows.filter(row => row[idColumn.name]==changedRowIdValue)[0])
+                let rowIndex = rows.indexOf(rows.filter(row => row[idColumn.name] == changedRowIdValue)[0])
                 let colName = Object.keys(changed[changedRowIdValue])[0];
                 let startingColIndex = columnExtensions.indexOf(columnExtensions.filter(col => col.name == colName)[0])
                 const newChangedValue = {};
 
                 const pasteDataArray = pasteData.includes("\r\n") ? pasteData.split("\r\n") : pasteData.split("\n"); //split row changes by \r\n or \n depending on what is present in the pasteData
                 const pasteDataMatrix = pasteDataArray.map(row => row.split("\t")); // split column changes by \t
-                if(pasteData.slice(-1) == "\n") pasteDataMatrix.pop(); // remove last item if new line at the end excel adds an additional new line
+                if (pasteData.slice(-1) == "\n") pasteDataMatrix.pop(); // remove last item if new line at the end excel adds an additional new line
 
-                for (let rowChangeArray of pasteDataMatrix){
+                for (let rowChangeArray of pasteDataMatrix) {
                     if (!rows[rowIndex]) break; // if row does not exist at index the following row will probably not exist either
                     const rowIdValue = rows[rowIndex][idColumn.name];
                     newChangedValue[rowIdValue] = {};
@@ -183,38 +182,37 @@ const DynamicTable = ({
                             } else {
                                 newChangedValue[rowIdValue][rowColToChange.name] = columnValue;
                             }
-                        } 
+                        }
                         colIndex++;
                     }
                     rowIndex++
                 }
-        
+
                 changed = newChangedValue;
             }
-            newRows = rows.map(row => (changed[row[idColumn.name]] ? changedRows.push({action:'changed', item:{...row, ...changed[row[idColumn.name]]}}) && { ...row, ...changed[row[idColumn.name]] } : row));
+            newRows = rows.map(row => (changed[row[idColumn.name]] ? changedRows.push({ action: 'changed', item: { ...row, ...changed[row[idColumn.name]] } }) && { ...row, ...changed[row[idColumn.name]] } : row));
         }
         if (deleted) {
-          const deletedSet = new Set(deleted);
-          deleted.map(deletedId => changedRows.push({action:'deleted', item: rows.filter(row => row[idColumn.name] === deletedId)[0]}))
-          newRows = rows.filter(row => !deletedSet.has(row[idColumn.name]));
+            const deletedSet = new Set(deleted);
+            deleted.map(deletedId => changedRows.push({ action: 'deleted', item: rows.filter(row => row[idColumn.name] === deletedId)[0] }))
+            newRows = rows.filter(row => !deletedSet.has(row[idColumn.name]));
         }
         setRows(newRows);
         onDataChange(changedRows);
         pasteData = null;
     };
 
-    const RenderCell = ({ onClick, ...restProps }) => {  
-        const {children, row, column, value}  = restProps  
-        console.log(restProps);  
-        const isDisabled = restProps.row && restProps.column && restProps.column.name && isCellDisabled({rowId: getRowId(restProps.row), columnName:restProps.column.name});
+    const RenderCell = ({ onClick, ...restProps }) => {
+        const { children, row, column, value } = restProps
+        const isDisabled = restProps.row && restProps.column && restProps.column.name && isCellDisabled({ rowId: getRowId(restProps.row), columnName: restProps.column.name });
         const isInError = restProps.row && restProps.column && restProps.column.name && errorCells.filter(ec => ec.columnName ? ec.columnName == restProps.column.name && ec.rowId == getRowId(restProps.row) : ec.rowId == getRowId(restProps.row)).length > 0;
         const filteredCellStyleObjs = restProps.row && restProps.column && restProps.column.name && cellStyles.filter(cs => cs.columnName ? cs.columnName == restProps.column.name && cs.rowId == getRowId(restProps.row) : cs.rowId == getRowId(restProps.row))
 
         const cellStyle = filteredCellStyleObjs && filteredCellStyleObjs.length > 0 && filteredCellStyleObjs[0].style ? filteredCellStyleObjs[0].style : {}
         return (
-            <VirtualTable.Cell {...restProps} style={{ backgroundColor: isDisabled && enableEdit ? "#E6E6E6":"#FFFFFF", border: isInError ? "2px solid #FF0000" : undefined, ...cellStyle, ...restProps.style}} tabIndex={0} onFocus={onClick}>
+            <VirtualTable.Cell {...restProps} style={{ backgroundColor: isDisabled && enableEdit ? "#E6E6E6" : "#FFFFFF", border: isInError ? "2px solid #FF0000" : undefined, ...cellStyle, ...restProps.style }} tabIndex={0} onFocus={onClick}>
                 {/* {column.renderValue ? column.renderValue(row) : restProps.value} */}
-                {children }
+                {children}
             </VirtualTable.Cell>
         )
     };
@@ -224,15 +222,15 @@ const DynamicTable = ({
         const cellStyleObjs = filteredStyleObjs.filter(obj => obj.columnName != null).map(obj => obj.style);
         const rowStyleObjs = filteredStyleObjs.filter(obj => obj.columnName == null).map(obj => obj.style);
 
-        const cellStyle = cellStyleObjs.reduce((resultObj, currentObj) => { return {...resultObj, ...currentObj}}, {});
-        const rowStyle = rowStyleObjs.reduce((resultObj, currentObj) => { return {...resultObj, ...currentObj}}, {});
+        const cellStyle = cellStyleObjs.reduce((resultObj, currentObj) => { return { ...resultObj, ...currentObj } }, {});
+        const rowStyle = rowStyleObjs.reduce((resultObj, currentObj) => { return { ...resultObj, ...currentObj } }, {});
 
         // Update Excel cell and row background styling.
         if (cellStyle.backgroundColor && cellStyle.backgroundColor[0] == '#') {
-            cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: cellStyle.backgroundColor.slice(1) }};
+            cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: cellStyle.backgroundColor.slice(1) } };
         }
         if (rowStyle.backgroundColor && rowStyle.backgroundColor[0] == '#') {
-            cell._row.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: rowStyle.backgroundColor.slice(1) }};
+            cell._row.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: rowStyle.backgroundColor.slice(1) } };
         }
     }
 
@@ -252,9 +250,15 @@ const DynamicTable = ({
         width: 100,
         ...column
     }));
-
+    function SelectionComponent({ row, onToggle }) {
+        return (
+            <Table.Cell>
+                <Input type='radio' checked={selection.length>0 ? selection[0]==getRowId(row): false} onFocus={onToggle} />
+            </Table.Cell>
+        )
+    }
     return (
-        <div onPaste={handlePasteEvent} style={{height: '100%'}} className="DynamicTable card">
+        <div onPaste={handlePasteEvent} style={{ height: '100%' }} className="DynamicTable card">
             <Grid
                 rows={rows}
                 columns={columns}
@@ -266,15 +270,20 @@ const DynamicTable = ({
                     grouping={groups}
                     onGroupingChange={setGroups}
                 />
-                <SummaryState 
+                <SummaryState
                     totalItems={totalSummaryItems}
                     groupItems={groupSummaryItems}
                 />
-                {onSelectedRowsChange != false &&
-                <SelectionState
-                    selection={selection}
-                    onSelectionChange={e => { if (selectedRows == false) setSelection(e); onSelectedRowsChange(rows.filter(r => e.includes(r[idColumn.name])));}}
-                />}
+                {
+                    onSelectedRowsChange != false && (radioSelection ? <SelectionState selection={selection} onSelectionChange={e => {
+                        const radioRow = e.length > 0 ? [e[e.length - 1]] : [];
+                        setSelection(radioRow);
+                        onSelectedRowsChange(rows.filter(r => radioRow.includes(r[idColumn.name])))
+                    }}
+                    /> : <SelectionState
+                        selection={selection}
+                        onSelectionChange={e => {if (selectedRows == false) setSelection(e); onSelectedRowsChange(rows.filter(r => e.includes(r[idColumn.name]))); }}
+                    />)}
                 <FilteringState defaultFilters={[]} />
                 <EditingState
                     onEditingCellsChange={(cells) => checkDisabledRowIds(cells)}
@@ -287,7 +296,7 @@ const DynamicTable = ({
                 <IntegratedGrouping />
                 <IntegratedSummary />
                 <IntegratedFiltering />
-                <OccupationDataTypeProvider for={['occupation']}/>
+                <OccupationDataTypeProvider for={['occupation']} />
                 <Plugin name="providers">
                     {columns.map((col) => {
                         if (col.editor) {
@@ -295,9 +304,9 @@ const DynamicTable = ({
                         }
                     })}
                 </Plugin>
-                <VirtualTable 
+                <VirtualTable
                     cellComponent={RenderCell}
-                    height={"auto"} 
+                    height={"auto"}
                 />
                 <TableColumnResizing
                     defaultColumnWidths={columnExtensions}
@@ -305,10 +314,8 @@ const DynamicTable = ({
                 <TableHeaderRow showSortingControls={enableSortingControls} />
                 {enableFilterRow && <TableFilterRow />}
                 <TableEditRow />
-                {onSelectedRowsChange != false && <TableSelection 
-                    showSelectAll={true}
-                />}
-                <TableGroupRow 
+                {onSelectedRowsChange != false && radioSelection ? <TableSelection cellComponent={SelectionComponent} /> : <TableSelection showSelectAll />}
+                <TableGroupRow
                     showColumnsWhenGrouped={true}
                 />
                 <TableSummaryRow />
@@ -350,4 +357,4 @@ const DynamicTable = ({
 };
 
 
-export default DynamicTable;
+export default DynamicTable;
